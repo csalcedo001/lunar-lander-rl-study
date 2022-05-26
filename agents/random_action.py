@@ -11,7 +11,7 @@ class RandomAgent():
 episodes = 10
 max_iter = 1000
 
-env = gym.make("LunarLander-v2")
+env = gym.make('LunarLander-v2')
 agent = RandomAgent(env)
 
 for episode in range(episodes):

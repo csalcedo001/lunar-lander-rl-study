@@ -1,0 +1,44 @@
+name: lunar-lander
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bzip2=1.0.8=h0d85af4_4
+  - ca-certificates=2022.5.18.1=h033912b_0
+  - libcxx=14.0.3=hc203e6f_0
+  - libffi=3.4.2=h0d85af4_5
+  - libzlib=1.2.11=h6c3fc93_1014
+  - ncurses=6.3=h96cf925_1
+  - openssl=3.0.3=hfe4f2af_0
+  - pcre=8.45=he49afe7_0
+  - pip=22.1.1=pyhd8ed1ab_0
+  - python=3.8.13=h66c20e1_0_cpython
+  - python_abi=3.8=2_cp38
+  - readline=8.1=h05e3726_0
+  - setuptools=62.3.2=py38h50d1736_0
+  - sqlite=3.38.5=hd9f0692_0
+  - swig=4.0.2=hce5123c_2
+  - tk=8.6.12=h5dbffcc_0
+  - wheel=0.37.1=pyhd8ed1ab_0
+  - xz=5.2.5=haf1e3a3_1
+  - zlib=1.2.11=h6c3fc93_1014
+  - pip:
+    - box2d-py==2.3.5
+    - certifi==2022.5.18.1
+    - charset-normalizer==2.0.12
+    - cloudpickle==2.1.0
+    - gym==0.23.1
+    - gym-notices==0.0.6
+    - idna==3.3
+    - importlib-metadata==4.11.4
+    - numpy==1.22.4
+    - pillow==9.1.1
+    - pygame==2.1.0
+    - requests==2.27.1
+    - torch==1.11.0
+    - torchaudio==0.11.0
+    - torchvision==0.12.0
+    - typing-extensions==4.2.0
+    - urllib3==1.26.9
+    - zipp==3.8.0
+prefix: /Users/cesar.salcedo/miniconda3/envs/lunar-lander
