@@ -1,2 +1,2 @@
-# lunar-lander-rl-study
-Reinforcement Learning study of multiple approaches to solve the Lunar Lander environment
+# Lunar Lander - Reinforcement Learning Study
+Study of Reinforcement Learning solutions for the Lunar Lander environment.
