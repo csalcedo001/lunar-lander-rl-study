@@ -75,7 +75,7 @@ class ReinforceAgent(nn.Module):
         return loss.item()
 
 
-episodes = 500
+episodes = 1000
 max_iter = 1000
 
 env = gym.make('LunarLander-v2')
@@ -97,5 +97,6 @@ for episode in range(episodes):
         if done:
             break
 
+    reward = np.sum(agent.rewards)
     loss = agent.optimize()
-    print('Loss: {}'.format(loss))
+    print('Episode {}. Loss: {}. Reward: {}'.format(episode, loss, reward))
