@@ -2,10 +2,11 @@ import gym
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.optim as optim
 from torch.distributions import Categorical
 
 class ReinforceAgent(nn.Module):
-    def __init__(self, lr=0.001):
+    def __init__(self, gamma=0.99, lr=0.01):
         super(ReinforceAgent, self).__init__()
 
         n_in = 8
@@ -13,10 +14,12 @@ class ReinforceAgent(nn.Module):
         
         n_h = 64
 
+        self.gamma = gamma
+
         layers = [
             nn.Linear(n_in, n_h),
-            nn.ReLU(),
-            nn.Linear(n_h, n_h),
+            # nn.ReLU(),
+            # nn.Linear(n_h, n_h),
             nn.ReLU(),
             nn.Linear(n_h, n_out),
         ]
@@ -24,8 +27,14 @@ class ReinforceAgent(nn.Module):
         # Remember that this network outputs parameters for
         # a distribution of actions, not actions themselves
         self.model = nn.Sequential(*layers)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
+        self.onpolicy_reset()
         self.train()
+
+    def onpolicy_reset(self):
+        self.log_probs = []
+        self.rewards = []
 
     def forward(self, state):
         pdparam = self.model(state)
@@ -46,11 +55,27 @@ class ReinforceAgent(nn.Module):
         # Compute the log probability of that action being
         # selected, necessary for backpropagation later
         log_prob = pd.log_prob(action)
+        self.log_probs.append(log_prob)
 
         return action.item()
+    
+    def optimize(self):
+        loss = 0.
+        rets = 0.
+        for t in reversed(range(len(self.rewards))):
+            rets = self.rewards[t] + self.gamma * rets
+            loss += -rets * self.log_probs[t]
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        self.onpolicy_reset()
+
+        return loss.item()
 
 
-episodes = 10
+episodes = 500
 max_iter = 1000
 
 env = gym.make('LunarLander-v2')
@@ -64,7 +89,13 @@ for episode in range(episodes):
         a = agent.act(s)
 
         s, r, done, _ = env.step(a)
+
+        agent.rewards.append(r)
+
         env.render()
 
         if done:
             break
+
+    loss = agent.optimize()
+    print('Loss: {}'.format(loss))
