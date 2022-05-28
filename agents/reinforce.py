@@ -1,9 +1,12 @@
 import gym
 import numpy as np
+from argparse import ArgumentParser
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Categorical
+
 
 class ReinforceAgent(nn.Module):
     def __init__(self, gamma=0.99, lr=0.01):
@@ -75,8 +78,23 @@ class ReinforceAgent(nn.Module):
         return loss.item()
 
 
-episodes = 1000
-max_iter = 1000
+parser = ArgumentParser()
+parser.add_argument(
+    '--episodes',
+    type=int, default=1000)
+parser.add_argument(
+    '--max-iter',
+    type=int, default=1000)
+parser.add_argument(
+    '--no-render',
+    default=False, action="store_const", const=True)
+
+args = parser.parse_args()
+
+episodes = args.episodes
+max_iter = args.max_iter
+no_render = args.no_render
+
 
 env = gym.make('LunarLander-v2')
 agent = ReinforceAgent()
@@ -92,7 +110,8 @@ for episode in range(episodes):
 
         agent.rewards.append(r)
 
-        env.render()
+        if not no_render:
+            env.render()
 
         if done:
             break
