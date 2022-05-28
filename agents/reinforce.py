@@ -119,3 +119,5 @@ for episode in range(episodes):
     reward = np.sum(agent.rewards)
     loss = agent.optimize()
     print('Episode {}. Loss: {}. Reward: {}'.format(episode, loss, reward))
+
+torch.save(agent.state_dict(), 'model.pt')
