@@ -2,6 +2,8 @@ import gym
 import numpy as np
 from argparse import ArgumentParser
 
+import torch
+
 from agents.reinforce import ReinforceAgent
 
 parser = ArgumentParser()
@@ -24,18 +26,19 @@ no_render = args.no_render
 
 env = gym.make('LunarLander-v2')
 agent = ReinforceAgent()
+agent.load_state_dict(torch.load('model.pt'))
 agent.eval()
 
 for episode in range(episodes):
     s = env.reset()
     done = False
 
+    reward = 0.
     for i in range(max_iter):
         a = agent.act(s)
 
         s, r, done, _ = env.step(a)
-
-        agent.rewards.append(r)
+        reward += r
 
         if not no_render:
             env.render()
@@ -43,6 +46,5 @@ for episode in range(episodes):
         if done:
             break
 
-    self.onpolicy_reset()
-    reward = np.sum(agent.rewards)
+    agent.onpolicy_reset()
     print('Episode {}. Reward: {}'.format(episode, reward))

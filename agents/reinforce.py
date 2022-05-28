@@ -78,46 +78,47 @@ class ReinforceAgent(nn.Module):
         return loss.item()
 
 
-parser = ArgumentParser()
-parser.add_argument(
-    '--episodes',
-    type=int, default=1000)
-parser.add_argument(
-    '--max-iter',
-    type=int, default=1000)
-parser.add_argument(
-    '--no-render',
-    default=False, action="store_const", const=True)
-
-args = parser.parse_args()
-
-episodes = args.episodes
-max_iter = args.max_iter
-no_render = args.no_render
-
-
-env = gym.make('LunarLander-v2')
-agent = ReinforceAgent()
-
-for episode in range(episodes):
-    s = env.reset()
-    done = False
-
-    for i in range(max_iter):
-        a = agent.act(s)
-
-        s, r, done, _ = env.step(a)
-
-        agent.rewards.append(r)
-
-        if not no_render:
-            env.render()
-
-        if done:
-            break
-
-    reward = np.sum(agent.rewards)
-    loss = agent.optimize()
-    print('Episode {}. Loss: {}. Reward: {}'.format(episode, loss, reward))
-
-torch.save(agent.state_dict(), 'model.pt')
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--episodes',
+        type=int, default=1000)
+    parser.add_argument(
+        '--max-iter',
+        type=int, default=1000)
+    parser.add_argument(
+        '--no-render',
+        default=False, action="store_const", const=True)
+    
+    args = parser.parse_args()
+    
+    episodes = args.episodes
+    max_iter = args.max_iter
+    no_render = args.no_render
+    
+    
+    env = gym.make('LunarLander-v2')
+    agent = ReinforceAgent()
+    
+    for episode in range(episodes):
+        s = env.reset()
+        done = False
+    
+        for i in range(max_iter):
+            a = agent.act(s)
+    
+            s, r, done, _ = env.step(a)
+    
+            agent.rewards.append(r)
+    
+            if not no_render:
+                env.render()
+    
+            if done:
+                break
+    
+        reward = np.sum(agent.rewards)
+        loss = agent.optimize()
+        print('Episode {}. Loss: {}. Reward: {}'.format(episode, loss, reward))
+    
+    torch.save(agent.state_dict(), 'model.pt')
