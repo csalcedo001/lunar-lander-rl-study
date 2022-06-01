@@ -44,4 +44,9 @@ class Agent(nn.Module):
 
     def _load(self, dict_path):
         path = os.path.join(dict_path, 'model.pt')
+
+        if not os.path.exists(path):
+            err_msg = "Error: no checkpoint '{}' in directory '{}'."
+            raise Exception(err_msg.format('model.pt', dict_path))
+        
         self.load_state_dict(torch.load(path))
