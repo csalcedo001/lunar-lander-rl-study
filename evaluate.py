@@ -1,10 +1,13 @@
 import os
 
 import gym
+import xlab.experiment as exp
+from xlab.utils import merge_dicts
 
 from agents.reinforce import ReinforceAgent
 from agents.random_action import RandomAgent
 from parser import get_parser
+from utils import get_config_from_string
 
 
 
@@ -16,7 +19,7 @@ args = parser.parse_args()
 # Main arguments
 env_name = args.env
 agent_name = args.agent
-checkpoint_dir = args.checkpoint
+checkpoint = args.checkpoint
 
 # Optional arguments
 episodes = args.episodes
@@ -52,12 +55,34 @@ if env_name not in valid_envs:
         valid_envs))
 
 # Validate checkpoint for agent type
-load_q = checkpoint_dir != None
-if load_q and agent_name == 'random':
-    raise Exception('Error: random agents cannot load from a checkpoint.')
+if checkpoint == None and agent_name !='random':
+    warning_msg = "Warning: no checkpoint was provided for agent '{}'."
+    print(warning_msg.format(agent_name))
 
-if load_q and not os.path.isdir(checkpoint_dir):
-    raise Exception('Error: checkpoint argument should be a directory.')
+if checkpoint != None:
+    if agent_name == 'random':
+        raise Exception('Error: random agents cannot load from a checkpoint.')
+    
+    if type(checkpoint) == str and os.path.isdir(checkpoint):
+        checkpoint_dir = checkpoint
+    else:
+        checkpoint_dict = get_config_from_string(checkpoint)
+            
+        executable = 'train.py'
+        command = 'python -m train {agent}'
+        req_args = {
+            'agent': agent_name,
+            'env': env_name,
+        }
+
+        checkpoint_config = merge_dicts(req_args, checkpoint_dict)
+        e = exp.Experiment(executable, checkpoint_config, command=command)
+
+        checkpoint_dir = e.get_dir()
+
+    if not os.path.isdir(checkpoint_dir):
+        error_msg = "Error: could not load checkpoint from '{}'."
+        raise Exception(error_msg.format(checkpoint_dir))
     
 
 
@@ -66,7 +91,7 @@ if load_q and not os.path.isdir(checkpoint_dir):
 env = gym.make(env_name)
 agent = agent_class(env)
 
-if not agent_name == 'random' and checkpoint_dir != None:
+if not agent_name == 'random' and checkpoint != None:
     agent.load(checkpoint_dir)
 
 agent.eval()
