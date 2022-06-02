@@ -32,8 +32,6 @@ class ReinforceAgent(Agent):
         self.model = nn.Sequential(*layers)
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
-        self.train()
-
     def forward(self, state):
         pdparam = self.model(state)
         return pdparam

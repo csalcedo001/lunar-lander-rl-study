@@ -3,7 +3,6 @@ import os
 import json
 import pickle
 from xlab.utils import merge_dicts
-import xlab.experiment as exp
 
 
 
@@ -65,15 +64,3 @@ def get_config_from_string(config_str):
         config = merge_dicts(config, new_config)
     
     return config
-            
-    executable = 'train.py'
-    command = 'python -m train {agent}'
-
-    req_args = {
-        'agent': 'random',
-    }
-    config_args = merge_dicts(req_args, config)
-
-    e = exp.Experiment(executable, config, command=command)
-
-    checkpoint_dir = e.get_dir()
