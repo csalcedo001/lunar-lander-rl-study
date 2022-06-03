@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 
+from utils import get_config_from_string
+
 def get_parser(episodes=100, max_iter=1000):
     parser = ArgumentParser()
 
@@ -9,6 +11,12 @@ def get_parser(episodes=100, max_iter=1000):
     parser.add_argument(
         '--env',
         type=str, default='LunarLander-v2')
+    parser.add_argument(
+        '--env-config',
+        type=get_config_from_string, default={})
+    parser.add_argument(
+        '--agent-config',
+        type=get_config_from_string, default={})
     parser.add_argument(
         '--checkpoint',
         type=str, default=None)

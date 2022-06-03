@@ -27,6 +27,8 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
     episodes = args.episodes
     max_iter = args.max_iter
     no_render = args.no_render
+    env_config = args.env_config
+    agent_config = args.agent_config
 
 
 
@@ -62,7 +64,8 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
 
     if checkpoint != None:
         if agent_name == 'random':
-            raise Exception('Error: random agents cannot load from a checkpoint.')
+            error_msg = 'Error: random agents cannot load from a checkpoint.'
+            raise Exception(error_msg)
         
         if type(checkpoint) == str and os.path.isdir(checkpoint):
             checkpoint_dir = checkpoint
@@ -89,8 +92,8 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
 
     ### Setup for training
 
-    env = gym.make(env_name)
-    agent = agent_class(env)
+    env = gym.make(env_name, **env_config)
+    agent = agent_class(env, **agent_config)
 
     if checkpoint != None:
         agent.load(checkpoint_dir)
@@ -119,6 +122,7 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
                 break
         
         loss = agent.train_end(s)
-        print('Episode {}. Loss: {}. Reward: {}'.format(episode, loss, total_reward))
+        print('Episode {}. Loss: {}. Reward: {}'.format(
+            episode, loss, total_reward))
 
     agent.save(dir)

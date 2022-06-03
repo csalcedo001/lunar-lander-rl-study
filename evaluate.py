@@ -22,6 +22,8 @@ agent_name = args.agent
 checkpoint = args.checkpoint
 
 # Optional arguments
+env_config = args.env_config
+agent_config = args.agent_config
 episodes = args.episodes
 max_iter = args.max_iter
 no_render = args.no_render
@@ -83,13 +85,13 @@ if checkpoint != None:
     if not os.path.isdir(checkpoint_dir):
         error_msg = "Error: could not load checkpoint from '{}'."
         raise Exception(error_msg.format(checkpoint_dir))
-    
+
 
 
 ### Setup for evaluation
 
-env = gym.make(env_name)
-agent = agent_class(env)
+env = gym.make(env_name, **env_config)
+agent = agent_class(env, **agent_config)
 
 if not agent_name == 'random' and checkpoint != None:
     agent.load(checkpoint_dir)

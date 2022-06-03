@@ -1,4 +1,6 @@
 numpy==1.22
 torch==1.11
 torchvision==0.12
+gym>=0.24
 gym[box2d]
+xlab
