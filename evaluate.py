@@ -4,10 +4,11 @@ import gym
 import xlab.experiment as exp
 from xlab.utils import merge_dicts
 
-from agents.reinforce import ReinforceAgent
-from agents.random_action import RandomAgent
 from parser import get_parser
 from utils import get_config_from_string
+from agents.reinforce import ReinforceAgent
+from agents.coagent import CoagentNetworkAgent
+from agents.random_action import RandomAgent
 
 
 
@@ -35,6 +36,7 @@ no_render = args.no_render
 # Validate and get agent class
 agent_name_type_map = {
     'reinforce': ReinforceAgent,
+    'coagent': CoagentNetworkAgent,
     'random': RandomAgent,
 }
 

@@ -4,9 +4,10 @@ import gym
 import xlab.experiment as exp
 from xlab.utils import merge_dicts
 
-from agents.reinforce import ReinforceAgent
 from parser import get_parser
 from utils import get_config_from_string
+from agents.reinforce import ReinforceAgent
+from agents.coagent import CoagentNetworkAgent
 
 
 
@@ -37,6 +38,7 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
     # Validate and get agent class
     agent_name_type_map = {
         'reinforce': ReinforceAgent,
+        'coagent': CoagentNetworkAgent,
     }
 
     if agent_name not in agent_name_type_map:

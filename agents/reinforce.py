@@ -45,6 +45,8 @@ class ReinforceAgent(Agent):
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
+        self.onpolicy_reset()
+
     def forward(self, state):
         z = self.base(state)
 
