@@ -53,8 +53,9 @@ class ReinforceAgent(Agent):
         if self.discrete_actions:
             pdparams = self.fc(z)
         else:
+            epsilon = 1e-6
             pdmean = self.fc_mean(z)
-            pdstd = self.fc_std(z)
+            pdstd = self.fc_std(z) + epsilon
             pdparams = pdmean, pdstd
         
         return pdparams
