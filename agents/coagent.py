@@ -1,83 +1,11 @@
 import copy
 import numpy as np
-import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.distributions as distr
 from gym import spaces
 
 from .agent import Agent
 from .reinforce import ReinforceAgent
 
-
-class CoagentNetModel(nn.Module):
-    def __init__(self, n_in, n_out, n_h):
-        super().__init__()
-
-        layers = [
-            nn.Linear(n_in, n_h),
-            nn.ReLU(),
-        ]
-        
-        self.base = nn.Sequential(*layers)
-        self.mean_net = nn.Sequential(nn.Linear(n_h, n_out), nn.Tanh())
-        self.std_net = nn.Sequential(nn.Linear(n_h, n_out), nn.Softplus())
-    
-    def forward(self, x):
-        z = self.base(x)
-
-        mean = self.mean_net(z)
-        std = self.std_net(z)
-
-        return mean, std
-
-
-class CoagentNetAgent(nn.Module):
-    def __init__(self, env):
-        super().__init__()
-
-        n_in = env.observation_space.shape[0]
-        n_out = env.action_space.n
-
-        n_h = 16
-
-        self.model = CoagentNetModel(n_in, n_out, n_h)
-
-        self.onpolicy_reset()
-        
-    def onpolicy_reset(self):
-        self.log_probs = []
-        self.rewards = []
-    
-    def forward(self, x):
-        pdparams = self.model(x)
-        return pdparams
-    
-    def act(self, state):
-        pdparams = self.forward(state)
-        pdmean, pdstd = pdparams
-        
-        pd = distr.normal.Normal(pdmean, pdstd)
-        action = pd.sample()
-
-        if self.training:
-            log_prob = pd.log_prob(action).sum()
-            self.log_probs.append(log_prob)
-
-        return action.detach()
-    
-    def optimize(self):
-        loss = 0.
-        rets = 0.
-        for t in reversed(range(len(self.rewards))):
-            rets = self.rewards[t] + self.gamma * rets
-            loss += -rets * self.log_probs[t]
-
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-
-        return loss.item()
 
 
 class CoagentNetRelativeEnv():
