@@ -77,7 +77,6 @@ class CoagentNetworkAgent(Agent):
     
     def train_start(self, state):
         self.reset_state()
-        
         self.states[0] = state
 
         for i, agent in enumerate(self.agents):
@@ -96,6 +95,8 @@ class CoagentNetworkAgent(Agent):
             agent.train_step(state, reward)
     
     def train_end(self, state):
+        self.states[0] = state
+
         for i, agent in enumerate(self.agents):
             agent.train_end(self.states[i])
     
@@ -126,3 +127,119 @@ class CoagentNetworkAgent(Agent):
         for layer_size in self.layer_sizes:
             self.states.append(np.zeros(layer_size))
             self.rewards.append(0)
+
+
+class CoagentNetworkAgent2(Agent):
+    def __init__(
+            self,
+            env,
+            layer_sizes,
+            gamma=0.99,
+            lr=0.01,
+            beta=0.5
+        ):
+
+        super().__init__(env)
+
+        n_in = env.observation_space.shape[0]
+
+        if type(env.action_space) == spaces.Discrete:
+            n_out = env.action_space.n
+        else:
+            n_out = env.action_space.shape[0]
+
+        self.layer_sizes = [n_in] + layer_sizes + [n_out]
+        self.beta = beta
+
+        self.agents = []
+        for i in range(len(self.layer_sizes) - 1):
+            n_in = self.layer_sizes[i]
+            n_out = self.layer_sizes[i + 1]
+
+            agent_relative_env = CoagentNetRelativeEnv(
+                n_in=n_in,
+                n_out=n_out)
+
+            agent = ReinforceAgent(
+                env=agent_relative_env,
+                gamma=gamma,
+                lr=lr)
+
+            self.agents.append(agent)
+        
+        self.agents = nn.ModuleList(self.agents)
+
+        self.reset_state()
+
+
+    def act(self, state):
+        self.states[0] = state
+
+        while self.turn != len(self.agents) - 1:
+            self.agent_turn()
+        self.agent_turn()
+        
+        return self.states[-1]
+    
+    def train_start(self, state):
+        self.reset_state()
+
+        for i, agent in enumerate(self.agents):
+            agent.train_start(self.states[i])
+
+        # for i, agent in enumerate(self.agents):
+        #     self.states[i] = state
+        #     next_state = agent.act(state)
+        #     agent.train_start(state)
+        #     state = next_state
+
+    def train_step(self, state, reward):
+        self.states[0] = state
+
+        for i in range(len(self.agents) - 1):
+            agent = self.agents[i]
+            agent.train_step(self.states[i], reward)
+            self.agent_turn()
+        
+        i = len(self.agents) - 1
+        agent = self.agents[i]
+        agent.train_step(self.states[i], reward)
+
+
+        # while self.timestep == 0:
+        #     self.states[self.turn] = state
+        #     agent.train_step(state, reward)
+        #     state = agent.act(state)
+        #     self.advance_turn()
+
+        # for i, agent in enumerate(self.agents):
+        #     self.states[i] = state
+        #     agent.train_step(state, reward)
+        #     state = agent.act(state)
+    
+    def train_end(self, state):
+        for i, agent in enumerate(self.agents):
+            agent.train_end(self.states[i])
+    
+    def save(self, save_dict):
+        self._save(save_dict)
+    
+    def load(self, save_dict):
+        self._load(save_dict)
+    
+    def reset_state(self):
+        self.timestep = 0
+        self.turn = 0
+
+        self.states = []
+        for layer_size in self.layer_sizes:
+            self.states.append(np.zeros(layer_size))
+    
+    def agent_turn(self):
+        i = self.turn
+        agent = self.agents[i]
+        self.states[i + 1] = agent.act(self.states[i])
+
+        self.turn = (self.turn + 1) % len(self.agents)
+        if self.turn == 0:
+            self.timestep += 1

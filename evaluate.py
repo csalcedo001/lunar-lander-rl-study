@@ -7,7 +7,7 @@ from xlab.utils import merge_dicts
 from parser import get_parser
 from utils import get_config_from_string
 from agents.reinforce import ReinforceAgent
-from agents.coagent import CoagentNetworkAgent
+from agents.coagent import CoagentNetworkAgent, CoagentNetworkAgent2
 from agents.random_action import RandomAgent
 
 
@@ -35,9 +35,10 @@ no_render = args.no_render
 
 # Validate and get agent class
 agent_name_type_map = {
+    'random': RandomAgent,
     'reinforce': ReinforceAgent,
     'coagent': CoagentNetworkAgent,
-    'random': RandomAgent,
+    'coagent2': CoagentNetworkAgent2,
 }
 
 if agent_name not in agent_name_type_map:
