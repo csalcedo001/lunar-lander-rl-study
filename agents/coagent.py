@@ -9,17 +9,23 @@ from .reinforce import ReinforceAgent
 
 
 class CoagentNetRelativeEnv():
-    def __init__(self, n_in, n_out):
+    def __init__(self, n_in, n_out, action_type):
         self.observation_shape = (n_in)
         self.observation_space = spaces.Box(
             high=np.ones(self.observation_shape) * np.inf,
             low=np.ones(self.observation_shape) * -np.inf,
             dtype=np.float32)
+        
         self.action_shape = (n_out)
-        self.action_space = spaces.Box(
-            high=np.ones(self.action_shape) * np.inf,
-            low=np.ones(self.action_shape) * -np.inf,
-            dtype=np.float32)
+        if action_type == 'continuous':
+            self.action_space = spaces.Box(
+                high=np.ones(self.action_shape) * np.inf,
+                low=np.ones(self.action_shape) * -np.inf,
+                dtype=np.float32)
+        elif action_type == 'discrete':
+            self.action_space = spaces.Discrete(self.action_shape)
+        else:
+            raise Exception('Invalid action type.')
         
 
 class CoagentNetworkAgent(Agent):
@@ -29,7 +35,8 @@ class CoagentNetworkAgent(Agent):
             layer_sizes,
             gamma=0.99,
             lr=0.01,
-            beta=0.5
+            beta=0.5,
+            action_type='continuous',
         ):
 
         super().__init__(env)
@@ -43,6 +50,7 @@ class CoagentNetworkAgent(Agent):
 
         self.layer_sizes = [n_in] + layer_sizes + [n_out]
         self.beta = beta
+        self.action_type = action_type
 
         self.agents = []
         for i in range(len(self.layer_sizes) - 1):
@@ -51,7 +59,8 @@ class CoagentNetworkAgent(Agent):
 
             agent_relative_env = CoagentNetRelativeEnv(
                 n_in=n_in,
-                n_out=n_out)
+                n_out=n_out,
+                action_type=action_type)
 
             agent = ReinforceAgent(
                 env=agent_relative_env,
@@ -113,6 +122,8 @@ class CoagentNetworkAgent(Agent):
 
         for i, agent in enumerate(self.agents):
             action = agent.act(states[i])
+            if self.action_type == 'discrete':
+                action = np.squeeze(np.eye(self.layer_sizes[i + 1])[action])
             next_state = action[:-1]
             reward = action[-1]
 
@@ -136,7 +147,8 @@ class CoagentNetworkAgent2(Agent):
             layer_sizes,
             gamma=0.99,
             lr=0.01,
-            beta=0.5
+            beta=0.5,
+            action_type='continuous',
         ):
 
         super().__init__(env)
@@ -150,6 +162,7 @@ class CoagentNetworkAgent2(Agent):
 
         self.layer_sizes = [n_in] + layer_sizes + [n_out]
         self.beta = beta
+        self.action_type = action_type
 
         self.agents = []
         for i in range(len(self.layer_sizes) - 1):
@@ -158,7 +171,8 @@ class CoagentNetworkAgent2(Agent):
 
             agent_relative_env = CoagentNetRelativeEnv(
                 n_in=n_in,
-                n_out=n_out)
+                n_out=n_out,
+                action_type=action_type)
 
             agent = ReinforceAgent(
                 env=agent_relative_env,
@@ -238,7 +252,11 @@ class CoagentNetworkAgent2(Agent):
     def agent_turn(self):
         i = self.turn
         agent = self.agents[i]
-        self.states[i + 1] = agent.act(self.states[i])
+
+        action = agent.act(self.states[i])
+        if self.action_type == 'discrete':
+            action = np.squeeze(np.eye(self.layer_sizes[i + 1])[action])
+        self.states[i + 1] = action
 
         self.turn = (self.turn + 1) % len(self.agents)
         if self.turn == 0:
