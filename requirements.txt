@@ -5,3 +5,4 @@ gym>=0.24
 gym[box2d]
 xlab
 ray[rllib]
+pyglet
