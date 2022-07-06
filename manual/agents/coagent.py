@@ -43,7 +43,8 @@ class CoagentNetworkAgent(Agent):
 
         n_in = env.observation_space.shape[0]
 
-        if type(env.action_space) == spaces.Discrete:
+        self.discrete_out = type(env.action_space) == spaces.Discrete
+        if self.discrete_out:
             n_out = env.action_space.n
         else:
             n_out = env.action_space.shape[0]
@@ -122,7 +123,7 @@ class CoagentNetworkAgent(Agent):
 
         for i, agent in enumerate(self.agents):
             action = agent.act(states[i])
-            if self.action_type == 'discrete':
+            if self.action_type == 'discrete' and i != len(self.layer_sizes) - 1 and not self.discrete_out:
                 action = np.squeeze(np.eye(self.layer_sizes[i + 1])[action])
             next_state = action[:-1]
             reward = action[-1]
