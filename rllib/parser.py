@@ -5,9 +5,9 @@ from utils import get_config_from_string
 def get_parser(episodes=100, max_iter=1000):
     parser = ArgumentParser()
 
-    parser.add_argument(
-        'agent',
-        type=str)
+    # parser.add_argument(
+    #     'agent',
+    #     type=str)
     parser.add_argument(
         '--env',
         type=str, default='LunarLander-v2')
