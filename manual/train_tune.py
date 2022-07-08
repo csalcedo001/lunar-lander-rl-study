@@ -93,7 +93,7 @@ if checkpoint != None:
 
 ### Setup for training
 
-agent_config['lr'] = tune.choice()
+agent_config['lr'] = tune.loguniform(0.0001, 0.01)
 
 env = gym.make(env_name, **env_config)
 agent = agent_class(env, **agent_config)
