@@ -3,10 +3,17 @@ import ray
 from ray import tune
 from ray.rllib.agents.ppo import PPOTrainer
 
+
+def on_episode_end(info):
+    pass
+
 # Configure the algorithm.
 config = {
     # Environment (RLlib understands openAI gym registered strings).
     "env": "LunarLander-v2",
+    "callbacks": {
+        "on_episode_end": tune.function(on_episode_end)
+    },
     "env_config": {
         "continuous": True,
     },
@@ -32,16 +39,13 @@ config = {
     },
 }
 
-ray.init()
-
 tune.run(
     "PPO",
     max_failures=10,
-    stop={"episode_reward_mean": 200},
     config=config,
+    stop={"timesteps_total": 1600000000},
     checkpoint_at_end=True,
     checkpoint_freq=1,
-    queue_trials=True,
 )
 
 

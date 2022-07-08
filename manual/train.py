@@ -1,6 +1,7 @@
 import os
 
 import gym
+from ray import tune
 import xlab.experiment as exp
 from xlab.utils import merge_dicts
 
