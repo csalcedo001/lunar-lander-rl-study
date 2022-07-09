@@ -5,10 +5,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xlab.experiment as exp
 
+
+agent = 'reinforce'
+episodes = 3
+num_samples = 5
+
+
 req_args = {
-    'agent': 'reinforce',
-    'episodes': 100,
-    'num_samples': 5,
+    'agent': agent,
+    'episodes': episodes,
+    'num_samples': num_samples,
 }
 
 e = exp.Experiment(
