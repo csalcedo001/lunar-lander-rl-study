@@ -24,6 +24,9 @@ def get_parser(episodes=100, max_iter=1000, num_samples=100):
         '--episodes',
         type=int, default=episodes)
     parser.add_argument(
+        '--seed',
+        type=int, default=0)
+    parser.add_argument(
         '--num-samples',
         type=int, default=num_samples)
     parser.add_argument(

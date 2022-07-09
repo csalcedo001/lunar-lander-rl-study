@@ -7,8 +7,8 @@ import xlab.experiment as exp
 
 
 agent = 'reinforce'
-episodes = 3
-num_samples = 5
+episodes = 100
+num_samples = 100
 
 
 req_args = {
@@ -20,7 +20,7 @@ req_args = {
 e = exp.Experiment(
     executable='train.py',
     req_args=req_args,
-    command='python {executable} {agent} --no-render',
+    command='python -m train {agent} --no-render',
 )
 
 e.args['no_render'] = True
@@ -38,7 +38,10 @@ for lr in lr_list:
     e.args['agent_config']['lr'] = lr
 
     if not e.is_complete():
-        e.run()
+        e.run(custom_command='screen -dmS {} '.format(lr) + e.command)
+
+for lr in lr_list:
+    e.args['agent_config']['lr'] = lr
 
     exp_dir = e.get_dir()
 
