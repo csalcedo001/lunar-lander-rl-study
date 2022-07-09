@@ -32,7 +32,7 @@ class CoagentNetworkAgent(Agent):
     def __init__(
             self,
             env,
-            layer_sizes,
+            layer_sizes=[4],
             gamma=0.99,
             lr=0.01,
             beta=0.5,
@@ -145,7 +145,7 @@ class CoagentNetworkAgent2(Agent):
     def __init__(
             self,
             env,
-            layer_sizes,
+            layer_sizes=[4],
             gamma=0.99,
             lr=0.01,
             beta=0.5,
