@@ -127,6 +127,12 @@ def train(config):
         print('Episode {}. Loss: {}. Reward: {}'.format(
             episode, loss, total_reward))
 
+        return {
+            "loss": loss,
+            "episode_reward_mean": total_reward,
+        }
+
+
     # agent.save(dir)
 
 
@@ -140,5 +146,5 @@ tune.run(
     name='thesis_001',
     config=config,
     num_samples=10,
-    stop={"mean": 200000},
+    stop={"episode_reward_mean": 100},
 )
