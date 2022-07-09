@@ -135,8 +135,8 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
                     break
             
             loss = agent.train_end(s)
-            print('Episode {}. Loss: {}. Reward: {}'.format(
-                episode, loss, total_reward))
+            print('Episode/sample ({}/{}). Loss: {}. Reward: {}'.format(
+                episode, sample, loss, total_reward))
             
             sample_losses.append(loss)
             sample_rewards.append(total_reward)

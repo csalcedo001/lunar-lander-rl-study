@@ -9,10 +9,10 @@ import xlab.experiment as exp
 
 
 
-agent = 'reinforce'
-episodes = 3
-num_samples = 5
-run_screen = False
+agent = 'coagent'
+episodes = 300
+num_samples = 100
+run_screen = True
 
 def base_experiment():
     req_args = {
@@ -44,7 +44,7 @@ for lr in lr_list:
 
     if not e.is_complete():
         if run_screen:
-            e.run(custom_command='screen -dmS "lr={}" '.format(lr) + e.command)
+            e.run(custom_command='screen -dmS lr_{} '.format(lr) + e.command)
         else:
             e.run()
 
@@ -58,7 +58,7 @@ for gamma in gamma_list:
 
     if not e.is_complete():
         if run_screen:
-            e.run(custom_command='screen -dmS "gamma={}" '.format(gamma) + e.command)
+            e.run(custom_command='screen -dmS gamma_{} '.format(gamma) + e.command)
         else:
             e.run()
 
@@ -72,7 +72,7 @@ if agent != 'reinforce':
 
         if not e.is_complete():
             if run_screen:
-                e.run(custom_command='screen -dmS "beta={}" '.format(beta) + e.command)
+                e.run(custom_command='screen -dmS beta_{} '.format(beta) + e.command)
             else:
                 e.run()
 
@@ -88,6 +88,6 @@ for agent in agents_list:
 
     if not e.is_complete():
         if run_screen:
-            e.run(custom_command='screen -dmS "agent={}" '.format(agent) + e.command)
+            e.run(custom_command='screen -dmS agent_{} '.format(agent) + e.command)
         else:
             e.run()

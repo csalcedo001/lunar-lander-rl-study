@@ -7,8 +7,8 @@ import xlab.experiment as exp
 
 
 agent = 'reinforce'
-episodes = 3
-num_samples = 5
+episodes = 100
+num_samples = 100
 
 def base_experiment():
     req_args = {
