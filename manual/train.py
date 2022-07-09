@@ -2,6 +2,8 @@ import os
 
 import gym
 from ray import tune
+import pickle
+import numpy as np
 import xlab.experiment as exp
 from xlab.utils import merge_dicts
 
@@ -27,6 +29,7 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
 
     # Optional arguments
     episodes = args.episodes
+    num_samples = args.num_samples
     max_iter = args.max_iter
     no_render = args.no_render
     env_config = args.env_config
@@ -97,36 +100,60 @@ with exp.setup(parser, hash_ignore=['no_render']) as setup:
     ### Setup for training
 
     env = gym.make(env_name, **env_config)
-    agent = agent_class(env, **agent_config)
 
-    if checkpoint != None:
-        agent.load(checkpoint_dir)
+    losses = []
+    rewards = []
+    for sample in range(num_samples):
+        agent = agent_class(env, **agent_config)
 
-    agent.train()
+        if checkpoint != None:
+            agent.load(checkpoint_dir)
 
-    for episode in range(episodes):
-        s = env.reset()
-        done = False
+        agent.train()
 
-        agent.train_start(s)
+        sample_losses = []
+        sample_rewards = []
+        for episode in range(episodes):
+            s = env.reset()
+            done = False
 
-        total_reward = 0.
-        for i in range(max_iter):
-            a = agent.act(s)
+            agent.train_start(s)
 
-            s, r, done, _ = env.step(a)
-            total_reward += r
+            total_reward = 0.
+            for i in range(max_iter):
+                a = agent.act(s)
 
-            agent.train_step(s, r)
+                s, r, done, _ = env.step(a)
+                total_reward += r
 
-            if not no_render:
-                env.render()
+                agent.train_step(s, r)
 
-            if done:
-                break
-        
-        loss = agent.train_end(s)
-        print('Episode {}. Loss: {}. Reward: {}'.format(
-            episode, loss, total_reward))
+                if not no_render:
+                    env.render()
 
-    agent.save(dir)
+                if done:
+                    break
+            
+            loss = agent.train_end(s)
+            print('Episode {}. Loss: {}. Reward: {}'.format(
+                episode, loss, total_reward))
+            
+            sample_losses.append(loss)
+            sample_rewards.append(total_reward)
+
+        agent.save(dir)
+
+        losses.append(sample_losses)
+        rewards.append(sample_rewards)
+
+    losses = np.array(losses)
+    reward = np.array(rewards)
+
+    losses_path = os.path.join(dir, 'losses.pkl')
+    rewards_path = os.path.join(dir, 'rewards.pkl')
+
+    with open(losses_path, 'wb') as out_file:
+        pickle.dump(losses, out_file)
+
+    with open(rewards_path, 'wb') as out_file:
+        pickle.dump(rewards, out_file)

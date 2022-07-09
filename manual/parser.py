@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 from utils import get_config_from_string
 
-def get_parser(episodes=100, max_iter=1000):
+def get_parser(episodes=100, max_iter=1000, num_samples=100):
     parser = ArgumentParser()
 
     parser.add_argument(
@@ -23,6 +23,9 @@ def get_parser(episodes=100, max_iter=1000):
     parser.add_argument(
         '--episodes',
         type=int, default=episodes)
+    parser.add_argument(
+        '--num-samples',
+        type=int, default=num_samples)
     parser.add_argument(
         '--max-iter',
         type=int, default=max_iter)
